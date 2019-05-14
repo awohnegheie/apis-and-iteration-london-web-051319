@@ -1,33 +1,44 @@
 require 'rest-client'
 require 'json'
-require 'pry'
 
 def get_character_movies_from_api(character_name)
   #make the web request
+def fetch_character
   response_string = RestClient.get('http://www.swapi.co/api/people/')
   response_hash = JSON.parse(response_string)
 
-  # iterate over the response hash to find the collection of `films` for the given
-  #   `character`
-  # collect those film API urls, make a web request to each URL to get the info
-  #  for that film
-  # return value of this method should be collection of info about each film.
-  #  i.e. an array of hashes in which each hash reps a given film
-  # this collection will be the argument given to `print_movies`
-  #  and that method will do some nice presentation stuff like puts out a list
-  #  of movies by title. Have a play around with the puts with other info about a given film.
+result = fetch_and_parse('http://www.swapi.co/api/people/')
+result['results']
+end
 end
 
-def print_movies(films)
-  # some iteration magic and puts out the movies in a nice list
+
+  def fetch_and_parse(url)
+    JSON.parse(RestClient.get(url))
+  end
+
+  def parse_character_movies(films_hash)
+    # some iteration magic and puts out the movies in a nice list
+    def get_film_info(url)
+      fetch_and_parse(url)
+    end
+  end
+
+
+  def show_character_movies(character)
+    film_hash = get_character_movies_from_api(character)
+    parse_character_movies(film_hash)
+  def character_info(character_name)
+    fetch_character.find { |c| c['names'].include?(character_name) }
+  end
 end
 
-def show_character_movies(character)
-  films = get_character_movies_from_api(character)
-  print_movies(films)
-end
 
-## BONUS
+  #bonus
 
-# that `get_character_movies_from_api` method is probably pretty long. Does it do more than one job?
-# can you split it up into helper methods?
+  def movies_hashes_for(character_name)
+    c_info = character_info(character_name)
+    film_info_array = c_info['films'].map do |url|
+      get_film_info(url)
+    end
+  end
